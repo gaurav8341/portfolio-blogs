@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import '../css/Header.css';
 
-const Header = () => {
+const Header = ({ onOpenPalette }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -27,6 +27,8 @@ const Header = () => {
     };
   }, [isMenuOpen]);
 
+  const navLinkClass = ({ isActive }) => `page-link${isActive ? ' active' : ''}`;
+
   return (
     <header className="site-header" role="banner">
       <div className="headwrapper">
@@ -34,19 +36,23 @@ const Header = () => {
           <Link className="site-title" to="/">Gaurav Rajput</Link>
         </div>
         <div className='nav-container'>
+          <button className="palette-btn" onClick={onOpenPalette}>
+            Search <span className="palette-btn-kbd">⌘K</span>
+          </button>
           <button className="menu-toggle" onClick={toggleMenu}>
             <span className="hamburger"></span>
           </button>
           <nav className={`site-nav ${isMenuOpen ? 'open' : ''}`}>
             <ul className="navbar-menu">
-              <li className="navbar-item"><Link to="/profile" className="page-link">Profile</Link></li>
-              <li className="navbar-item"><Link to="/blogs" className="page-link">Blog</Link></li>
-              <li className="navbar-item"><Link to="/projects" className="page-link">Projects</Link></li>
+              <li className="navbar-item"><NavLink end to="/" className={navLinkClass} onClick={closeMenu}>Home</NavLink></li>
+              <li className="navbar-item"><NavLink to="/profile" className={navLinkClass} onClick={closeMenu}>Profile</NavLink></li>
+              <li className="navbar-item"><NavLink to="/projects" className={navLinkClass} onClick={closeMenu}>Projects</NavLink></li>
+              <li className="navbar-item"><NavLink to="/blogs" className={navLinkClass} onClick={closeMenu}>Blog</NavLink></li>
+              <li className="navbar-item"><NavLink to="/resume" className={navLinkClass} onClick={closeMenu}>Résumé</NavLink></li>
             </ul>
           </nav>
         </div>
       </div>
-      {/* {isMenuOpen && <div className="overlay" onClick={closeMenu}></div>} */}
     </header>
   );
 };

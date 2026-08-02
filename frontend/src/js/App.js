@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './Home'; 
+import Home from './Home';
 import Project from './Project';
 import ProfilePage from './ProfilePage';
 import BlogList from './BlogList';
 import BlogDetail from './BlogDetail';
+import ResumePage from './ResumePage';
+import UsesPage from './UsesPage';
 import '../css/App.css';
 import { fetchUrls } from './utils';
 import axios from 'axios';
@@ -13,7 +15,7 @@ import axios from 'axios';
 
 function App() {
   const [blogPaths, setBlogPaths] = useState({});
-  // const [content, setContent] = useState(null);
+  const [blogs, setBlogs] = useState([]);
   const [urls, setUrls] = useState({});
 
   useEffect(() => {
@@ -26,6 +28,7 @@ function App() {
           throw new Error('Failed to fetch blogs');
         }
         const blogs = response.data;
+        setBlogs(blogs);
         const paths = blogs.reduce((acc, blog) => {
           acc[blog.id] = blog.path;
           return acc;
@@ -46,8 +49,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<ProfilePage contentUrl={urls.profilePageUrl} />} />
         <Route path="/blogs" element={<BlogList />} />
-        <Route path="/blogs/:id" element={<BlogDetail blogPaths={blogPaths} />} />
+        <Route path="/blogs/:id" element={<BlogDetail blogPaths={blogPaths} blogs={blogs} />} />
         <Route path="/projects" element={<Project />} />
+        <Route path="/resume" element={<ResumePage />} />
+        <Route path="/uses" element={<UsesPage />} />
       </Routes>
     </Router>
   );

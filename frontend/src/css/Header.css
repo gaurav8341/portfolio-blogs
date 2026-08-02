@@ -1,8 +1,10 @@
 .site-header {
-  background-color: #333;
-  padding: 1rem;
-  position: relative; /* Ensure the header is positioned relative to the overlay */
-  z-index: 1000; /* Ensure the header is above the overlay */
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--divider);
+  padding: 16px 40px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .headwrapper {
@@ -10,6 +12,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  gap: 24px;
 }
 
 .title-container {
@@ -19,48 +22,66 @@
 .nav-container {
   display: flex;
   align-items: center;
-  justify-content: flex-end; /* Align the nav and button to the right */
-  max-width: 50%; /* Ensure the nav-container takes up a maximum of 50% of the width */
+  gap: 16px;
+  justify-content: flex-end;
 }
 
 .site-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #f1f1f1;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--text);
   text-decoration: none;
-}
-
-.site-title:visited {
-  color: #ff6347; /* Ensure the color remains the same after clicking */
 }
 
 .site-nav {
   display: flex;
-  width: 100%; /* Ensure the site-nav takes up the full width of the nav-container */
 }
 
 .navbar-menu {
   display: flex;
+  align-items: center;
   list-style: none;
+  gap: 24px;
   margin: 0;
   padding: 0;
-  color: #ff6347;
-  font-weight: bold;
-  justify-content: flex-end; /* Align the navbar items to the right */
-  width: 100%; /* Ensure the navbar-menu takes up the full width of the site-nav */
 }
 
 .navbar-item {
-  margin-left: 1rem;
+  margin: 0;
 }
 
 .page-link {
-  color: #ff6347;
+  color: var(--text);
+  font-size: 14px;
   text-decoration: none;
 }
 
-.page-link:hover {
-  text-decoration: underline;
+.page-link:hover,
+.page-link.active {
+  color: var(--accent);
+}
+
+.palette-btn {
+  border: 1px solid var(--divider-strong);
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+.palette-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.palette-btn-kbd {
+  opacity: 0.5;
+  margin-left: 6px;
 }
 
 .menu-toggle {
@@ -68,13 +89,12 @@
   background: none;
   border: none;
   cursor: pointer;
-  margin-left: 1rem; /* Add some space between the nav and the button */
 }
 
 .hamburger {
-  width: 25px;
-  height: 3px;
-  background-color: #f1f1f1;
+  width: 22px;
+  height: 2px;
+  background-color: var(--text);
   display: block;
   position: relative;
 }
@@ -82,71 +102,60 @@
 .hamburger::before,
 .hamburger::after {
   content: '';
-  width: 25px;
-  height: 3px;
-  background-color: #f1f1f1;
+  width: 22px;
+  height: 2px;
+  background-color: var(--text);
   display: block;
   position: absolute;
   left: 0;
 }
 
 .hamburger::before {
-  top: -8px;
+  top: -7px;
 }
 
 .hamburger::after {
-  top: 8px;
-}
-
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999; /* Ensure the overlay is above other elements but below the header */
+  top: 7px;
 }
 
 /* Media Queries for Mobile Devices */
 @media (max-width: 768px) {
-  .headwrapper {
-    flex-direction: row; /* Ensure the title and button are in a row */
-  }
-
   .site-nav {
     display: none;
     flex-direction: column;
     position: absolute;
     top: 60px;
     right: 0;
-    background-color: #333; /* Match the background color of the site header */
+    background-color: var(--surface);
     width: 100%;
     text-align: center;
-    border: 1px solid #444; /* Add border to the navbar menu */
-    opacity: 0; /* Start with the navbar hidden */
-    transform: translateY(-20px); /* Start with the navbar slightly above */
-    transition: opacity 0.3s ease, transform 0.3s ease; /* Add transition for opacity and transform */
+    border-bottom: 1px solid var(--divider);
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
 
   .site-nav.open {
     display: flex;
-    opacity: 1; /* Make the navbar visible */
-    transform: translateY(0); /* Move the navbar to its original position */
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .navbar-menu {
     flex-direction: column;
-    max-width: 100%; /* Ensure the navbar-menu takes up a maximum of 50% of the width */
-    margin-left: auto; /* Align the navbar-menu to the right */
+    width: 100%;
   }
 
   .navbar-item {
-    margin: 1rem 0;
+    margin: 0.75rem 0;
   }
 
   .menu-toggle {
     display: block;
+  }
+
+  .palette-btn span {
+    display: none;
   }
 }
 

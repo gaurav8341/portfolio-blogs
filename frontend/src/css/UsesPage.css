@@ -1,0 +1,42 @@
+.uses-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 64px 40px 72px;
+}
+
+.uses-heading {
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 10px;
+}
+
+.uses-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 0 0 30px;
+}
+
+.uses-group {
+  margin-bottom: 26px;
+}
+
+.uses-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.uses-list li {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+  .uses-page {
+    padding: 40px 20px 56px;
+  }
+}

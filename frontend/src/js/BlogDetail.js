@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import CommonLayout from './CommonLayout';
 import axios from 'axios';
 import Mermaid from './Mermaid';
 import '../css/BlogDetail.css';
+import { readingTime } from './utils';
 
-const BlogDetail = ({ blogPaths }) => {
+const BlogDetail = ({ blogPaths, blogs }) => {
     const { id } = useParams();
     const [content, setContent] = useState(null);
-    console.log("blogPaths dict",blogPaths);
+    const meta = (blogs || []).find((blog) => blog.id === id);
+
     useEffect(() => {
         const fetchBlogContent = async () => {
             try {
@@ -47,14 +49,41 @@ const BlogDetail = ({ blogPaths }) => {
         }
     };
 
+    // The markdown source already starts with an H1 matching the title shown
+    // in the meta header below, so drop that leading line to avoid showing it twice.
+    const body = content ? content.replace(/^#\s+.+\n+/, '') : content;
+
     return (
         <CommonLayout>
             <div className="blog-detail">
+                <Link to="/blogs" className="back-link">← Back to blog</Link>
+                {meta && (
+                    <>
+                        <h1 className="blog-detail-title">{meta.title}</h1>
+                        <div className="blog-detail-meta">
+                            <span>{meta.date}</span>
+                            {content && (
+                                <>
+                                    <span>·</span>
+                                    <span>{readingTime(content)} min read</span>
+                                </>
+                            )}
+                            {meta.tags && meta.tags.length > 0 && (
+                                <>
+                                    <span>·</span>
+                                    <span>{meta.tags.join(', ')}</span>
+                                </>
+                            )}
+                        </div>
+                    </>
+                )}
+                <div className="blog-detail-body">
                     {content ? (
-                        <ReactMarkdown components={components}>{content}</ReactMarkdown>
+                        <ReactMarkdown components={components}>{body}</ReactMarkdown>
                     ) : (
                         <p>Loading...</p>
                     )}
+                </div>
             </div>
         </CommonLayout>
     );

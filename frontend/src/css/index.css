@@ -2,12 +2,23 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: auto;
+  background: #1a140f;
+  color: #f2e9df;
+}
+
+::selection {
+  background: rgba(226, 163, 85, 0.3);
+}
+
+:focus-visible {
+  outline: 2px solid #e2a355;
+  outline-offset: 2px;
 }
 
 code {

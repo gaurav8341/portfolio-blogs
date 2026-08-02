@@ -1,98 +1,80 @@
 .project-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background-color: rgba(20, 15, 10, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
   z-index: 1000;
 }
 
-.title {
-  font-size: 1.5rem;
-  margin: 0;
-  color: #ff6347;
-}
-
 .project-modal-content {
-  background-color: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  width: 80%;
-  max-width: 600px;
+  background-color: var(--surface);
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  width: min(560px, 100%);
   position: relative;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
 }
 
 .close-button {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 1.5rem;
+  top: 18px;
+  right: 20px;
+  font-size: 22px;
+  line-height: 1;
+  opacity: 0.6;
   cursor: pointer;
+  color: var(--text);
+}
+
+.close-button:hover {
+  opacity: 1;
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text);
+}
+
+.github-link {
+  color: var(--text);
+  flex: none;
 }
 
 .github-link svg {
-  width: 24px;
-  height: 24px;
-  margin-left: 0.5rem;
+  display: block;
+}
+
+.github-link:hover {
+  color: var(--accent);
+}
+
+.modal-description {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 18px;
 }
 
 .project-skills {
-  margin-top: 1rem;
-}
-
-.skills-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
 }
-
-.skill {
-  background-color: #444;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  margin: 0.5rem;
-  text-align: center;
-  position: relative;
-}
-
-.skill-logo {
-  width: 24px;
-  height: 24px;
-  margin-right: 0.5rem;
-}
-
-
-.live-url-link {
-  background-color: #444;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  text-decoration: none;
-}
-
-.live-url-link:hover {
-  background-color: #444;
-  transform: scale(1.20); /* Slightly enlarge the project on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
 
 .live-url {
-  text-align: center;
-  margin-top: 1rem;
-  
+  text-align: left;
 }
-
-/* .live-url:hover {
-  text-decoration: underline;
-} */
