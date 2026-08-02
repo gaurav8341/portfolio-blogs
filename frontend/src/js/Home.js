@@ -5,7 +5,6 @@ import axios from 'axios';
 import '../css/Home.css';
 import { fetchUrls, describeGithubEvent, timeAgo } from './utils';
 import ProjectModal from './ProjectModal';
-import ProjectCard from './ProjectCard';
 import SkillChips from './SkillChips';
 import useScrollReveal from './useScrollReveal';
 
@@ -15,6 +14,20 @@ const FALLBACK_ACTIVITY = [
   { id: 'f3', text: 'starred', repo: 'facebook/react', time: '1w ago' },
 ];
 
+const USES_DATA = [
+  { category: 'Editor', items: ['VS Code', 'Vim keybindings', 'GitHub Copilot'] },
+  { category: 'Terminal', items: ['iTerm2', 'zsh + oh-my-zsh', 'tmux'] },
+  { category: 'Machine', items: ['MacBook Pro 14", M-series', '32GB RAM', 'Two 27" monitors'] },
+  { category: 'Deploy', items: ['Vercel', 'GitHub Actions', 'Cloudflare'] },
+];
+
+const SectionKicker = ({ children }) => (
+  <h6 className="section-kicker">
+    <span className="section-kicker-dash" />
+    {children}
+  </h6>
+);
+
 const Home = () => {
   const [projects, setProjects] = useState([]);
   const [blogs, setBlogs] = useState([]);
@@ -23,10 +36,12 @@ const Home = () => {
   const [activity, setActivity] = useState([]);
   const navigate = useNavigate();
 
+  const [thinkRef, thinkRevealed] = useScrollReveal();
   const [activityRef, activityRevealed] = useScrollReveal();
-  const [projectsRef, projectsRevealed] = useScrollReveal();
-  const [postsRef, postsRevealed] = useScrollReveal();
+  const [shippedRef, shippedRevealed] = useScrollReveal();
+  const [intoRef, intoRevealed] = useScrollReveal();
   const [skillsRef, skillsRevealed] = useScrollReveal();
+  const [usesRef, usesRevealed] = useScrollReveal();
   const [contactRef, contactRevealed] = useScrollReveal();
 
   useEffect(() => {
@@ -76,35 +91,26 @@ const Home = () => {
     setSelectedProject(null);
   };
 
+  const featuredProjects = projects.slice(0, 3);
+  const featuredBlogs = blogs.slice(0, 2);
+
   return (
     <CommonLayout>
       <div className="home">
-        <section className="hero-subtitle">
-          <span>Gaurav Rajput — software developer, tech enthusiast, occasional blogger</span>
+        <section className="hero">
+          <div className="hero-eyebrow">Open to freelance work</div>
+          <h1 className="hero-title">Hey, I'm Gaurav — a software developer who's happiest when a messy problem turns into a clean little tool.</h1>
+          <p className="hero-bio">Most days I'm building web apps, poking at side projects, or writing up whatever I just learned the hard way. This whole site is one of those projects.</p>
         </section>
 
-        <section className="hero">
-          <div className="hero-card">
-            <div>
-              <div className="hero-eyebrow">What I've been building lately</div>
-              <h1 className="hero-title">Learn With Me</h1>
-              <p className="hero-description">A blog engine that pulls posts straight from a GitHub repo, so publishing a new post is just a git push. This site's own writing runs on it.</p>
-              <div className="hero-tags">
-                <span className="hero-tag">React</span>
-                <span className="hero-tag">Node.js</span>
-                <span className="hero-tag">GitHub API</span>
-              </div>
-              <div className="hero-actions">
-                <a href="https://github.com/gaurav8341/LearnWithMe" target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub</a>
-                <Link to="/projects" className="btn btn-secondary">More projects</Link>
-              </div>
-            </div>
-            <div className="hero-image-slot">Drop a screenshot or demo GIF</div>
-          </div>
+        <section ref={thinkRef} className={`reveal ${thinkRevealed ? 'revealed' : ''} section-block`}>
+          <SectionKicker>How I think</SectionKicker>
+          <p className="prose-line">I started out tinkering with scripts that automated my own annoyances, and that habit never really went away. If something is repetitive or fiddly, my instinct is to build a small tool for it.</p>
+          <p className="prose-line prose-line-last">I pick absurdly small project scopes on purpose — a one-sentence definition of "done," written before any code. It's the only thing that's reliably gotten side projects across the finish line.</p>
         </section>
 
         <section ref={activityRef} className={`reveal ${activityRevealed ? 'revealed' : ''} section-block`}>
-          <h6 className="section-kicker">Recent activity</h6>
+          <SectionKicker>Lately</SectionKicker>
           <div className="activity-list">
             {(activity.length ? activity : FALLBACK_ACTIVITY).map((ev) => (
               <div key={ev.id} className="activity-row">
@@ -115,45 +121,63 @@ const Home = () => {
           </div>
         </section>
 
-        <section ref={projectsRef} className={`reveal ${projectsRevealed ? 'revealed' : ''} section-block`}>
-          <h6 className="section-kicker">More projects</h6>
-          <div className="card-grid">
-            {projects.map((project, index) => (
-              <ProjectCard key={index} project={project} onClick={() => openProject(project)} />
+        <section ref={shippedRef} className={`reveal ${shippedRevealed ? 'revealed' : ''} section-block`}>
+          <SectionKicker>What I've shipped</SectionKicker>
+          <div className="stacked-list">
+            {featuredProjects.map((project, index) => (
+              <div key={index} className="shipped-item" onClick={() => openProject(project)}>
+                <div className="shipped-item-top">
+                  <span className="shipped-item-title">{project.title}</span>
+                  {project.category && <span className="shipped-item-category">{project.category}</span>}
+                </div>
+                <p className="shipped-item-description">{project.description}</p>
+              </div>
             ))}
           </div>
-          <div className="view-all">
-            <Link to="/projects" className="view-all-link">View all projects →</Link>
-          </div>
+          <Link to="/projects" className="inline-link">View all projects →</Link>
         </section>
 
         {selectedProject && (
           <ProjectModal project={selectedProject} onClose={closeProject} />
         )}
 
-        <section ref={postsRef} className={`reveal ${postsRevealed ? 'revealed' : ''} section-block`}>
-          <h6 className="section-kicker">Featured posts</h6>
-          <div className="card-grid">
-            {blogs.map((blog, index) => (
-              <div key={index} className="post-card">
-                <div className="post-card-title">{blog.title}</div>
-                <p className="post-card-excerpt">{blog.excerpt || blog.preview}</p>
+        <section ref={intoRef} className={`reveal ${intoRevealed ? 'revealed' : ''} section-block`}>
+          <SectionKicker>What I'm into</SectionKicker>
+          <div className="stacked-list into-list">
+            {featuredBlogs.map((blog, index) => (
+              <div key={index} className="into-item">
+                <div className="into-item-title">{blog.title}</div>
+                <p className="into-item-excerpt">{blog.excerpt || blog.preview}</p>
                 <button className="read-more" onClick={() => navigate(`/blogs/${blog.id}`)}>Read more →</button>
               </div>
             ))}
           </div>
-          <div className="view-all">
-            <Link to="/blogs" className="view-all-link">View all posts →</Link>
-          </div>
+          <Link to="/blogs" className="inline-link">View all posts →</Link>
         </section>
 
         <section ref={skillsRef} className={`reveal ${skillsRevealed ? 'revealed' : ''} section-block`}>
-          <h6 className="section-kicker">Skills &amp; tools</h6>
+          <SectionKicker>Skills &amp; tools</SectionKicker>
           <SkillChips skills={skills} />
         </section>
 
+        <section ref={usesRef} className={`reveal ${usesRevealed ? 'revealed' : ''} section-block`}>
+          <SectionKicker>Tools I use</SectionKicker>
+          <div className="uses-grid">
+            {USES_DATA.map((group) => (
+              <div key={group.category}>
+                <div className="uses-group-label">{group.category}</div>
+                <ul className="uses-group-list">
+                  {group.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section ref={contactRef} className={`reveal ${contactRevealed ? 'revealed' : ''} section-block contact-block`}>
-          <h6 className="section-kicker">Get in touch</h6>
+          <SectionKicker>Get in touch</SectionKicker>
           <p className="contact-line">Building something interesting, or just want to talk shop? My inbox is open.</p>
           <div className="social-media">
             <a href="https://github.com/gaurav8341" className="social-link" target="_blank" rel="noopener noreferrer">

@@ -45,7 +45,6 @@ const Header = ({ onOpenPalette }) => {
           <nav className={`site-nav ${isMenuOpen ? 'open' : ''}`}>
             <ul className="navbar-menu">
               <li className="navbar-item"><NavLink end to="/" className={navLinkClass} onClick={closeMenu}>Home</NavLink></li>
-              <li className="navbar-item"><NavLink to="/profile" className={navLinkClass} onClick={closeMenu}>Profile</NavLink></li>
               <li className="navbar-item"><NavLink to="/projects" className={navLinkClass} onClick={closeMenu}>Projects</NavLink></li>
               <li className="navbar-item"><NavLink to="/blogs" className={navLinkClass} onClick={closeMenu}>Blog</NavLink></li>
               <li className="navbar-item"><NavLink to="/resume" className={navLinkClass} onClick={closeMenu}>Résumé</NavLink></li>

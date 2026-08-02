@@ -6,11 +6,9 @@ import '../css/CommandPalette.css';
 
 const PAGES = [
   { label: 'Home', path: '/' },
-  { label: 'Profile', path: '/profile' },
   { label: 'Projects', path: '/projects' },
   { label: 'Blog', path: '/blogs' },
   { label: 'Résumé', path: '/resume' },
-  { label: 'Uses', path: '/uses' },
 ];
 
 const CommandPalette = ({ isOpen, onClose }) => {

@@ -75,8 +75,8 @@ footer {
 
 .reveal {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
 .reveal.revealed {
@@ -121,11 +121,22 @@ footer {
 }
 
 .section-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--accent);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 13px;
-  margin: 0 0 16px;
+  letter-spacing: 0.1em;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 20px;
+}
+
+.section-kicker-dash {
+  width: 20px;
+  height: 2px;
+  background: var(--accent);
+  flex: none;
 }
 
 .chip {
