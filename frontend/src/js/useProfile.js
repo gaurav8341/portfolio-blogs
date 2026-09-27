@@ -14,6 +14,12 @@ import { fetchUrls } from './utils';
 let cache = null;
 let inflight = null;
 
+/** Clears the module-scope cache. Tests need it; nothing else should call it. */
+export const resetProfileCache = () => {
+  cache = null;
+  inflight = null;
+};
+
 const loadProfile = () => {
   if (cache) return Promise.resolve(cache);
   if (inflight) return inflight;

@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import axios from 'axios';
 import Home from './Home';
 import ResumePage from './ResumePage';
+import { resetProfileCache } from './useProfile';
 
 jest.mock('axios');
 
@@ -21,19 +22,20 @@ const renderSettled = async (ui) => {
 
 const PROFILE = {
   uses: [{ category: 'Shell', items: ['zsh'] }],
-  resume: [
+  work: [
     {
       id: 'upr',
-      type: 'work',
       role: 'Senior Software Engineer',
       org: 'UrbanPiper',
+      period: 'Nov 2025 — Present',
       summary: 'Order squad.',
       details: ['Aggregator integrations.', 'Cross-service debugging.'],
       skills: ['Python', 'MySQL'],
     },
+  ],
+  education: [
     {
       id: 'edu',
-      type: 'education',
       role: 'B.Tech, Computer Science',
       details: ['Coursework.'],
       skills: ['Python'],
@@ -42,6 +44,9 @@ const PROFILE = {
 };
 
 beforeEach(() => {
+  // profile.json is cached in module scope, so each test starts from empty.
+  resetProfileCache();
+
   axios.get.mockImplementation((url) => {
     if (typeof url === 'string' && url.endsWith('/url.json')) {
       return Promise.resolve({
@@ -117,20 +122,58 @@ describe('ResumePage', () => {
     // Résumé entries come from remote JSON, so optional fields must be guarded.
     await renderSettled(<ResumePage />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Education' }));
-
     const header = screen.getByRole('button', { name: /B\.Tech/i });
     expect(header).toBeInTheDocument();
     expect(header.querySelector('.resume-entry-period')).toBeNull();
     expect(header.querySelector('.resume-entry-org')).toBeNull();
   });
 
-  test('filters entries by type', async () => {
+  test('renders work and education as separate sections, both visible at once', async () => {
     await renderSettled(<ResumePage />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Education' }));
-
+    expect(screen.getByText('Work')).toBeInTheDocument();
+    expect(screen.getByText('Education')).toBeInTheDocument();
+    expect(screen.getByText('Senior Software Engineer')).toBeInTheDocument();
     expect(screen.getByText('B.Tech, Computer Science')).toBeInTheDocument();
-    expect(screen.queryByText('Senior Software Engineer')).not.toBeInTheDocument();
+  });
+
+  test('filtering by a skill hides sections with no match', async () => {
+    await renderSettled(<ResumePage />);
+
+    // MySQL belongs only to the work entry, so Education drops out entirely.
+    fireEvent.click(screen.getByRole('button', { name: 'MySQL' }));
+
+    expect(screen.getByText('Senior Software Engineer')).toBeInTheDocument();
+    expect(screen.queryByText('B.Tech, Computer Science')).not.toBeInTheDocument();
+    expect(screen.queryByText('Education')).not.toBeInTheDocument();
+
+    // Python is on both, so both sections come back.
+    fireEvent.click(screen.getByRole('button', { name: 'MySQL' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Python' }));
+
+    expect(screen.getByText('Senior Software Engineer')).toBeInTheDocument();
+    expect(screen.getByText('B.Tech, Computer Science')).toBeInTheDocument();
+  });
+
+  test('falls back to the older single-array resume shape', async () => {
+    // Guards the deploy window where the feed and the code disagree.
+    axios.get.mockImplementation((url) => {
+      if (typeof url === 'string' && url.endsWith('/url.json')) {
+        return Promise.resolve({ data: { profilePath: '/profile.json' } });
+      }
+      return Promise.resolve({
+        data: {
+          resume: [
+            { id: 'w', type: 'work', role: 'Legacy Role', details: ['x'], skills: ['Go'] },
+            { id: 'e', type: 'education', role: 'Legacy Degree', skills: ['Go'] },
+          ],
+        },
+      });
+    });
+
+    withRouter(<ResumePage />);
+
+    expect(await screen.findByText('Legacy Role')).toBeInTheDocument();
+    expect(screen.getByText('Legacy Degree')).toBeInTheDocument();
   });
 });

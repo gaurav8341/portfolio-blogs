@@ -17,27 +17,29 @@
   margin: 0 0 26px;
 }
 
-.resume-filters {
+/* Work and education render as separate sections, each with its own heading
+   and timeline, rather than one interleaved list. */
+.resume-section + .resume-section {
+  margin-top: 46px;
+}
+
+.resume-section-title {
   display: flex;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
-.resume-filter-btn {
-  font-size: 12px;
-  padding: 6px 14px;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  border: 1px solid var(--divider-strong);
-  color: var(--text);
-  background: transparent;
-  font-family: var(--font-body);
-}
-
-.resume-filter-btn:hover,
-.resume-filter-btn.active {
-  border-color: var(--accent);
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 22px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--accent);
+}
+
+.resume-section-dash {
+  width: 20px;
+  height: 2px;
+  background: var(--accent);
+  flex: none;
 }
 
 .resume-skill-filters {
