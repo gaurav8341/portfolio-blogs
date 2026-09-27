@@ -84,6 +84,56 @@
   color: var(--accent);
 }
 
+.modal-category {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: -6px 0 12px;
+}
+
+.modal-tagline {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+/* Detail as scannable bullets rather than one dense paragraph. */
+.modal-highlights {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.modal-highlights li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.modal-highlights li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.modal-context {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0 0 18px;
+}
+
 .modal-description {
   font-size: 14px;
   color: var(--text-secondary);

@@ -4,6 +4,7 @@ import axios from 'axios';
 import Home from './Home';
 import ResumePage from './ResumePage';
 import { resetProfileCache } from './useProfile';
+import { projectTagline, projectHighlights, projectRemainder } from './projectShape';
 
 jest.mock('axios');
 
@@ -75,7 +76,7 @@ describe('Home', () => {
     await renderSettled(<Home />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: /carry a food order/i })
+      screen.getByRole('heading', { level: 1, name: /the abstractions run out/i })
     ).toBeInTheDocument();
 
     [/How I think/, /Lately/, /What I.?ve shipped/, /What I.?m into/, /Skills & tools/, /Tools I use/, /Get in touch/]
@@ -175,5 +176,35 @@ describe('ResumePage', () => {
 
     expect(await screen.findByText('Legacy Role')).toBeInTheDocument();
     expect(screen.getByText('Legacy Degree')).toBeInTheDocument();
+  });
+});
+
+describe('project shape', () => {
+  const modern = {
+    tagline: 'Short line.',
+    highlights: ['One', 'Two'],
+  };
+
+  const legacy = {
+    description: 'First sentence here. Then a second one. And a third.',
+  };
+
+  test('prefers tagline and highlights when present', () => {
+    expect(projectTagline(modern)).toBe('Short line.');
+    expect(projectHighlights(modern)).toEqual(['One', 'Two']);
+    expect(projectRemainder(modern)).toBe('');
+  });
+
+  test('falls back to the first sentence of an old description', () => {
+    expect(projectTagline(legacy)).toBe('First sentence here.');
+    expect(projectHighlights(legacy)).toEqual([]);
+    // The rest is still shown, so an old feed loses nothing.
+    expect(projectRemainder(legacy)).toBe('Then a second one. And a third.');
+  });
+
+  test('survives a project with neither field', () => {
+    expect(projectTagline({})).toBe('');
+    expect(projectHighlights({})).toEqual([]);
+    expect(projectRemainder({})).toBe('');
   });
 });

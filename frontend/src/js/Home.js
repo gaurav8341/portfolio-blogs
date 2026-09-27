@@ -7,6 +7,7 @@ import ProjectModal from './ProjectModal';
 import SkillChips from './SkillChips';
 import Reveal from './Reveal';
 import useProfile from './useProfile';
+import { projectTagline } from './projectShape';
 import { staggerStyle } from './motion';
 import { SkeletonList, SkeletonChips } from './Skeleton';
 
@@ -89,20 +90,20 @@ const Home = () => {
         {/* Hero copy animates on mount, each line a beat behind the last. */}
         <section className="hero">
           <div className="hero-eyebrow anim anim-pop-in" style={{ '--delay': '80ms' }}>
-            Backend engineer — order systems
+            C/C++ · CUDA · systems
           </div>
           <h1 className="hero-title anim anim-fade-up" style={{ '--delay': '180ms' }}>
-            Hey, I'm Gaurav — I build the systems that carry a food order from the app you tapped to the kitchen that cooks it.
+            Hey, I'm Gaurav — I work on the layer where the abstractions run out and you have to know what the hardware is actually doing.
           </h1>
           <p className="hero-bio anim anim-fade-up" style={{ '--delay': '300ms' }}>
-            I work on the order pipeline at UrbanPiper: the aggregator integrations that take orders in, the services that relay them to a merchant's point-of-sale, and the on-call work of finding out why one of them didn't.
+            Three years of production C/C++ GPU video pipelines — GStreamer, DeepStream, TensorRT on live camera feeds — and I'm now going deeper through Georgia Tech's OMSCS: FlashAttention written by hand in CUDA, GPU microarchitecture simulation, POSIX systems programming. By day I build Python order-processing services at UrbanPiper.
           </p>
         </section>
 
         <Reveal as="section" className="section-block">
           <SectionKicker>How I think</SectionKicker>
-          <p className="prose-line">Most of what I do is integration work: two systems that each make perfect sense on their own, and a contract between them that doesn't quite hold. The interesting part is almost never the happy path.</p>
-          <p className="prose-line prose-line-last">Because I spend so much time reading logs across service boundaries, I've come to care a lot about systems that make their own failures legible — a trace id that survives every hop, an error that says which side broke the contract. It's the difference between a ten-minute fix and a lost afternoon.</p>
+          <p className="prose-line">I like the problems where the answer is in the hardware — why a kernel is memory-bound rather than compute-bound, where the shared-memory bank conflicts are, what the warp scheduler does when a cache-thrashing warp keeps winning. Measure it in a profiler, don't guess at it.</p>
+          <p className="prose-line prose-line-last">That instinct came from production, not coursework. A video pipeline dropping frames under continuous multi-stream load is completely indifferent to how clean your abstractions are, and the fix is usually a layer below where you were looking. I'd rather understand that layer than work around it.</p>
         </Reveal>
 
         <Reveal as="section" className="section-block">
@@ -142,7 +143,7 @@ const Home = () => {
                     <span className="shipped-item-title">{project.title}</span>
                     {project.category && <span className="shipped-item-category">{project.category}</span>}
                   </div>
-                  <p className="shipped-item-description">{project.description}</p>
+                  <p className="shipped-item-description">{projectTagline(project)}</p>
                 </div>
               ))}
             </Reveal>

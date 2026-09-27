@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { DURATION, prefersReducedMotion, staggerStyle } from './motion';
+import { projectTagline, projectHighlights, projectRemainder } from './projectShape';
 import '../css/ProjectModal.css';
 
 const ProjectModal = ({ project, onClose }) => {
@@ -68,7 +69,23 @@ const ProjectModal = ({ project, onClose }) => {
             </a>
           )}
         </div>
-        <p className="modal-description">{project.description}</p>
+        {project.category && <div className="modal-category">{project.category}</div>}
+        <p className="modal-tagline">{projectTagline(project)}</p>
+
+        {projectHighlights(project).length > 0 ? (
+          <ul className="modal-highlights stagger revealed">
+            {projectHighlights(project).map((point, index) => (
+              <li key={index} style={staggerStyle(index)}>{point}</li>
+            ))}
+          </ul>
+        ) : (
+          projectRemainder(project) && (
+            <p className="modal-description">{projectRemainder(project)}</p>
+          )
+        )}
+
+        {project.context && <p className="modal-context">{project.context}</p>}
+
         <div className="project-skills stagger revealed">
           {(project.skills || []).map((skill, index) => (
             <span key={index} className="chip" style={staggerStyle(index)}>

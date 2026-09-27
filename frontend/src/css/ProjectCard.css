@@ -63,11 +63,35 @@
   color: var(--accent);
 }
 
-.project-card-description {
+/* One short line of "what this is", clamped so no card becomes a paragraph.
+   The detail lives in the modal as bullets. */
+.project-card-tagline {
   font-size: 13px;
+  line-height: 1.55;
   color: var(--text-secondary);
   opacity: 0.9;
   margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.project-card-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.project-card-skill {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  background: var(--accent-chip-bg);
+  white-space: nowrap;
 }
 
 /* Hidden affordance that rises into view on hover. */
