@@ -19,17 +19,43 @@ const renderSettled = async (ui) => {
   return utils;
 };
 
+const PROFILE = {
+  uses: [{ category: 'Shell', items: ['zsh'] }],
+  resume: [
+    {
+      id: 'upr',
+      type: 'work',
+      role: 'Senior Software Engineer',
+      org: 'UrbanPiper',
+      summary: 'Order squad.',
+      details: ['Aggregator integrations.', 'Cross-service debugging.'],
+      skills: ['Python', 'MySQL'],
+    },
+    {
+      id: 'edu',
+      type: 'education',
+      role: 'B.Tech, Computer Science',
+      details: ['Coursework.'],
+      skills: ['Python'],
+    },
+  ],
+};
+
 beforeEach(() => {
   axios.get.mockImplementation((url) => {
     if (typeof url === 'string' && url.endsWith('/url.json')) {
       return Promise.resolve({
         data: {
+          profilePath: '/profile.json',
           featuredProjectsPath: '/projects.json',
           featuredBlogsPath: '/blogs.json',
           skillsJsonPath: '/skills.json',
           blogsJsonPath: '/all-blogs.json',
         },
       });
+    }
+    if (typeof url === 'string' && url.endsWith('/profile.json')) {
+      return Promise.resolve({ data: PROFILE });
     }
     return Promise.resolve({ data: [] });
   });
@@ -44,7 +70,7 @@ describe('Home', () => {
     await renderSettled(<Home />);
 
     expect(
-      screen.getByRole('heading', { level: 1, name: /happiest when a messy problem/i })
+      screen.getByRole('heading', { level: 1, name: /carry a food order/i })
     ).toBeInTheDocument();
 
     [/How I think/, /Lately/, /What I.?ve shipped/, /What I.?m into/, /Skills & tools/, /Tools I use/, /Get in touch/]
@@ -69,10 +95,10 @@ describe('Home', () => {
 });
 
 describe('ResumePage', () => {
-  test('expands an entry on click and keeps the panel mounted when collapsed', () => {
-    const { container } = withRouter(<ResumePage />);
+  test('expands an entry on click and keeps the panel mounted when collapsed', async () => {
+    const { container } = await renderSettled(<ResumePage />);
 
-    const header = screen.getByRole('button', { name: /Software Developer/i });
+    const header = screen.getByRole('button', { name: /Senior Software Engineer/i });
     const panel = container.querySelector('.resume-details-wrap');
 
     // Panel stays in the DOM while collapsed so the height can animate.
@@ -84,15 +110,27 @@ describe('ResumePage', () => {
 
     expect(header).toHaveAttribute('aria-expanded', 'true');
     expect(container.querySelector('.resume-details-wrap')).toHaveClass('open');
-    expect(screen.getByText(/Shipped 6\+ client projects solo/i)).toBeInTheDocument();
+    expect(screen.getByText('Aggregator integrations.')).toBeInTheDocument();
   });
 
-  test('filters entries by type', () => {
-    withRouter(<ResumePage />);
+  test('renders an entry with no period or org without breaking', async () => {
+    // Résumé entries come from remote JSON, so optional fields must be guarded.
+    await renderSettled(<ResumePage />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Education' }));
+
+    const header = screen.getByRole('button', { name: /B\.Tech/i });
+    expect(header).toBeInTheDocument();
+    expect(header.querySelector('.resume-entry-period')).toBeNull();
+    expect(header.querySelector('.resume-entry-org')).toBeNull();
+  });
+
+  test('filters entries by type', async () => {
+    await renderSettled(<ResumePage />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Education' }));
 
     expect(screen.getByText('B.Tech, Computer Science')).toBeInTheDocument();
-    expect(screen.queryByText('Backend Engineer')).not.toBeInTheDocument();
+    expect(screen.queryByText('Senior Software Engineer')).not.toBeInTheDocument();
   });
 });

@@ -6,21 +6,9 @@ import { fetchUrls, describeGithubEvent, timeAgo } from './utils';
 import ProjectModal from './ProjectModal';
 import SkillChips from './SkillChips';
 import Reveal from './Reveal';
+import useProfile from './useProfile';
 import { staggerStyle } from './motion';
 import { SkeletonList, SkeletonChips } from './Skeleton';
-
-const FALLBACK_ACTIVITY = [
-  { id: 'f1', text: 'pushed to', repo: 'gaurav8341/portfolio-blogs', time: '2d ago' },
-  { id: 'f2', text: 'opened an issue on', repo: 'gaurav8341/LearnWithMe', time: '5d ago' },
-  { id: 'f3', text: 'starred', repo: 'facebook/react', time: '1w ago' },
-];
-
-const USES_DATA = [
-  { category: 'Editor', items: ['VS Code', 'Vim keybindings', 'GitHub Copilot'] },
-  { category: 'Terminal', items: ['iTerm2', 'zsh + oh-my-zsh', 'tmux'] },
-  { category: 'Machine', items: ['MacBook Pro 14", M-series', '32GB RAM', 'Two 27" monitors'] },
-  { category: 'Deploy', items: ['Vercel', 'GitHub Actions', 'Cloudflare'] },
-];
 
 const SectionKicker = ({ children }) => (
   <h6 className="section-kicker">
@@ -36,7 +24,10 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState(null);
   const [activity, setActivity] = useState([]);
+  const [activityFailed, setActivityFailed] = useState(false);
   const navigate = useNavigate();
+  const { profile } = useProfile();
+  const uses = (profile && profile.uses) || [];
 
   useEffect(() => {
     const fetchProjectsAndBlogs = async () => {
@@ -70,9 +61,12 @@ const Home = () => {
           repo: (ev.repo && ev.repo.name) || '',
           time: timeAgo(ev.created_at),
         }));
-        setActivity(items.length ? items : FALLBACK_ACTIVITY);
+        setActivity(items);
       } catch (error) {
-        setActivity(FALLBACK_ACTIVITY);
+        // The GitHub API is called unauthenticated (60 requests/hour per IP),
+        // so rate limiting is routine. Say nothing rather than show invented
+        // activity, which is what the old hardcoded fallback did.
+        setActivityFailed(true);
       }
     };
 
@@ -95,32 +89,40 @@ const Home = () => {
         {/* Hero copy animates on mount, each line a beat behind the last. */}
         <section className="hero">
           <div className="hero-eyebrow anim anim-pop-in" style={{ '--delay': '80ms' }}>
-            Open to freelance work
+            Backend engineer — order systems
           </div>
           <h1 className="hero-title anim anim-fade-up" style={{ '--delay': '180ms' }}>
-            Hey, I'm Gaurav — a software developer who's happiest when a messy problem turns into a clean little tool.
+            Hey, I'm Gaurav — I build the systems that carry a food order from the app you tapped to the kitchen that cooks it.
           </h1>
           <p className="hero-bio anim anim-fade-up" style={{ '--delay': '300ms' }}>
-            Most days I'm building web apps, poking at side projects, or writing up whatever I just learned the hard way. This whole site is one of those projects.
+            I work on the order pipeline at UrbanPiper: the aggregator integrations that take orders in, the services that relay them to a merchant's point-of-sale, and the on-call work of finding out why one of them didn't.
           </p>
         </section>
 
         <Reveal as="section" className="section-block">
           <SectionKicker>How I think</SectionKicker>
-          <p className="prose-line">I started out tinkering with scripts that automated my own annoyances, and that habit never really went away. If something is repetitive or fiddly, my instinct is to build a small tool for it.</p>
-          <p className="prose-line prose-line-last">I pick absurdly small project scopes on purpose — a one-sentence definition of "done," written before any code. It's the only thing that's reliably gotten side projects across the finish line.</p>
+          <p className="prose-line">Most of what I do is integration work: two systems that each make perfect sense on their own, and a contract between them that doesn't quite hold. The interesting part is almost never the happy path.</p>
+          <p className="prose-line prose-line-last">Because I spend so much time reading logs across service boundaries, I've come to care a lot about systems that make their own failures legible — a trace id that survives every hop, an error that says which side broke the contract. It's the difference between a ten-minute fix and a lost afternoon.</p>
         </Reveal>
 
         <Reveal as="section" className="section-block">
           <SectionKicker>Lately</SectionKicker>
-          <Reveal className="activity-list" variant="fade" stagger>
-            {(activity.length ? activity : FALLBACK_ACTIVITY).map((ev, index) => (
-              <div key={ev.id} className="activity-row" style={staggerStyle(index)}>
-                <span className="activity-text">{ev.text} <strong className="activity-repo">{ev.repo}</strong></span>
-                <span className="activity-time">{ev.time}</span>
-              </div>
-            ))}
-          </Reveal>
+          {activity.length > 0 ? (
+            <Reveal className="activity-list" variant="fade" stagger>
+              {activity.map((ev, index) => (
+                <div key={ev.id} className="activity-row" style={staggerStyle(index)}>
+                  <span className="activity-text">{ev.text} <strong className="activity-repo">{ev.repo}</strong></span>
+                  <span className="activity-time">{ev.time}</span>
+                </div>
+              ))}
+            </Reveal>
+          ) : (
+            <p className="prose-line prose-line-last">
+              {activityFailed
+                ? 'GitHub activity is unavailable right now.'
+                : 'Loading recent activity…'}
+            </p>
+          )}
         </Reveal>
 
         <Reveal as="section" className="section-block">
@@ -181,21 +183,23 @@ const Home = () => {
           {loading ? <SkeletonChips count={9} /> : <SkillChips skills={skills} />}
         </Reveal>
 
-        <Reveal as="section" className="section-block">
-          <SectionKicker>Tools I use</SectionKicker>
-          <Reveal className="uses-grid" variant="fade" stagger>
-            {USES_DATA.map((group, index) => (
-              <div key={group.category} style={staggerStyle(index)}>
-                <div className="uses-group-label">{group.category}</div>
-                <ul className="uses-group-list">
-                  {group.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        {uses.length > 0 && (
+          <Reveal as="section" className="section-block">
+            <SectionKicker>Tools I use</SectionKicker>
+            <Reveal className="uses-grid" variant="fade" stagger>
+              {uses.map((group, index) => (
+                <div key={group.category} style={staggerStyle(index)}>
+                  <div className="uses-group-label">{group.category}</div>
+                  <ul className="uses-group-list">
+                    {(group.items || []).map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </Reveal>
           </Reveal>
-        </Reveal>
+        )}
 
         <Reveal as="section" className="section-block contact-block">
           <SectionKicker>Get in touch</SectionKicker>
