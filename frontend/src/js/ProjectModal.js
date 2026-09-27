@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { DURATION, prefersReducedMotion, staggerStyle } from './motion';
 import { projectTagline, projectHighlights, projectRemainder } from './projectShape';
 import '../css/ProjectModal.css';
@@ -31,20 +32,39 @@ const ProjectModal = ({ project, onClose }) => {
       }
     };
 
-    // Keep the page behind the overlay from scrolling.
+    // Keep the page behind the overlay from scrolling. Hiding the body's
+    // overflow removes the scrollbar, so the page behind would jump sideways
+    // by its width — pad the body by exactly that much to hold it still.
+    // Overlay scrollbars report 0 here, so this is a no-op on those.
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
     const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+
     document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) {
+      const currentPadding = parseFloat(window.getComputedStyle(document.body).paddingRight) || 0;
+      document.body.style.paddingRight = `${currentPadding + scrollbarWidth}px`;
+    }
+
     document.addEventListener('keydown', onKeyDown);
 
-    if (contentRef.current) contentRef.current.focus();
+    // preventScroll: focusing otherwise scrolls the backdrop to bring the
+    // content into view, so a tall modal opened part-way down its own body.
+    if (contentRef.current) contentRef.current.focus({ preventScroll: true });
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [requestClose]);
 
-  return (
+  /* Rendered into document.body rather than in place. The page wrapper runs a
+     transform animation with fill-mode: both, and an element with a filling
+     transform animation stays a containing block for position:fixed children
+     even once the computed value is none — so an in-place backdrop sized
+     itself to the page, not the viewport, and centred against the wrong box. */
+  return createPortal(
     <div
       className={`project-modal${closing ? ' closing' : ''}`}
       onClick={requestClose}
@@ -99,7 +119,8 @@ const ProjectModal = ({ project, onClose }) => {
             )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

@@ -3,10 +3,19 @@
   inset: 0;
   background-color: rgba(20, 15, 10, 0.7);
   display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 20px;
   z-index: 1000;
+  /* A modal taller than the viewport must not be centred: centring splits the
+     overflow above and below, and the part above the scroll origin can never
+     be reached. The `safe` keyword falls back to start-alignment exactly when
+     that would happen. The plain `center` line before it is the fallback for
+     engines that don't parse `safe`. */
+  align-items: center;
+  align-items: safe center;
+  justify-content: center;
+  justify-content: safe center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   animation: backdrop-in var(--dur-base) var(--ease-out) both;
   /* Blur the page behind the overlay where the browser supports it. */
   backdrop-filter: blur(3px);
@@ -21,6 +30,9 @@
   padding: 28px;
   border-radius: var(--radius-lg);
   width: min(560px, 100%);
+  /* No auto margins: they re-introduce the unreachable-top problem by
+     centring even when the free space is negative. */
+  flex: none;
   position: relative;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
   animation: modal-in var(--dur-slow) var(--ease-out) both;
