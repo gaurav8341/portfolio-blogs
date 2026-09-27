@@ -27,20 +27,25 @@ const Header = ({ onOpenPalette }) => {
     };
   }, [isMenuOpen]);
 
-  const navLinkClass = ({ isActive }) => `page-link${isActive ? ' active' : ''}`;
+  const navLinkClass = ({ isActive }) => `page-link underline-grow${isActive ? ' active' : ''}`;
 
   return (
-    <header className="site-header" role="banner">
+    <header className="site-header anim anim-fade-down" role="banner">
       <div className="headwrapper">
         <div className="title-container">
           <Link className="site-title" to="/">Gaurav Rajput</Link>
         </div>
         <div className='nav-container'>
-          <button className="palette-btn" onClick={onOpenPalette}>
+          <button className="palette-btn press" onClick={onOpenPalette}>
             Search <span className="palette-btn-kbd">⌘K</span>
           </button>
-          <button className="menu-toggle" onClick={toggleMenu}>
-            <span className="hamburger"></span>
+          <button
+            className="menu-toggle"
+            onClick={toggleMenu}
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
+          >
+            <span className={`hamburger${isMenuOpen ? ' open' : ''}`}></span>
           </button>
           <nav className={`site-nav ${isMenuOpen ? 'open' : ''}`}>
             <ul className="navbar-menu">

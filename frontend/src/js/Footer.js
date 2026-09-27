@@ -1,10 +1,11 @@
 import React from 'react';
+import Reveal from './Reveal';
 import '../css/Footer.css';
 
 const Footer = () => {
   return (
     <footer className="site-footer">
-      <div className="wrapper">
+      <Reveal className="wrapper" variant="up">
         <p>&copy; 2026 Gaurav Rajput. All rights reserved.</p>
         <div className="social-media">
           <a href="https://github.com/gaurav8341" className="social-link" target="_blank" rel="noopener noreferrer">
@@ -17,7 +18,7 @@ const Footer = () => {
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M12 12.713l11.985-8.713H.015L12 12.713zM12 14.287L.015 5.574V18.426L12 14.287zM12 14.287L23.985 18.426V5.574L12 14.287z"/></svg>
           </a>
         </div>
-      </div>
+      </Reveal>
     </footer>
   );
 };

@@ -6,6 +6,12 @@
   font-size: 36px;
   font-weight: 500;
   color: var(--text);
+  margin: 0 0 8px;
+}
+
+.project-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
   margin: 0 0 26px;
 }
 

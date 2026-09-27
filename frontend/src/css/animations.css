@@ -1,0 +1,348 @@
+/* ==========================================================================
+   animations.css — the motion system for the whole site.
+
+   Everything animated on the site pulls from the tokens and classes here, so
+   timing stays consistent across pages. Three layers:
+
+     1. tokens      — durations and easings
+     2. keyframes   — the raw motion
+     3. utilities   — .reveal (scroll-triggered), .anim-* (mount), hover/press
+
+   The reduced-motion block at the bottom is the global off switch.
+   ========================================================================== */
+
+:root {
+  /* Easings. ease-out-quint is the workhorse: fast start, long soft settle. */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-back: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  --dur-instant: 120ms;
+  --dur-fast: 180ms;
+  --dur-base: 280ms;
+  --dur-slow: 480ms;
+  --dur-reveal: 640ms;
+
+  /* Gap between consecutive items in a staggered list. */
+  --stagger-step: 65ms;
+}
+
+/* ==========================================================================
+   Keyframes
+   ========================================================================== */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translate3d(0, 20px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fade-down {
+  from { opacity: 0; transform: translate3d(0, -14px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fade-left {
+  from { opacity: 0; transform: translate3d(-20px, 0, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes fade-right {
+  from { opacity: 0; transform: translate3d(20px, 0, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pop-in {
+  0%   { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Page-level entrance: a shorter, flatter fade-up so navigation feels quick. */
+@keyframes page-enter {
+  from { opacity: 0; transform: translate3d(0, 10px, 0); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Overlays */
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes backdrop-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translate3d(0, 16px, 0) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes modal-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.98); }
+}
+
+@keyframes palette-in {
+  from { opacity: 0; transform: translate3d(0, -18px, 0) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+@keyframes palette-out {
+  from { opacity: 1; transform: none; }
+  to   { opacity: 0; transform: translate3d(0, -10px, 0) scale(0.98); }
+}
+
+/* Loading shimmer for skeleton placeholders. */
+@keyframes shimmer {
+  from { background-position: -160% 0; }
+  to   { background-position: 160% 0; }
+}
+
+/* Timeline / kicker dash drawing itself in from the left. */
+@keyframes draw-x {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+@keyframes draw-y {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* Soft halo on the resume timeline dots. */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(226, 163, 85, 0.45); }
+  70%  { box-shadow: 0 0 0 7px rgba(226, 163, 85, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(226, 163, 85, 0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   Scroll reveal
+
+   Driven by useScrollReveal / <Reveal>: the element carries .reveal plus a
+   variant, and .revealed is added when it scrolls into view.
+   ========================================================================== */
+
+.reveal {
+  opacity: 0;
+  transition:
+    opacity var(--dur-reveal) var(--ease-out) var(--reveal-delay, 0ms),
+    transform var(--dur-reveal) var(--ease-out) var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+.reveal-up     { transform: translate3d(0, 22px, 0); }
+.reveal-down   { transform: translate3d(0, -16px, 0); }
+.reveal-left   { transform: translate3d(-24px, 0, 0); }
+.reveal-right  { transform: translate3d(24px, 0, 0); }
+.reveal-scale  { transform: scale(0.97); }
+.reveal-fade   { transform: none; }
+
+/* Staggered children. Each child gets style={{ '--i': index }}; the nth-child
+   rules below cover static markup where setting --i would be noise.
+
+   These use `animation` rather than `transition` on purpose. A transition-based
+   stagger needs transition-delay on the child, and that delay then also applies
+   to every later hover transition on the same element — so a card deep in a list
+   would take half a second to respond to the cursor. animation-fill-mode:
+   backwards holds the start frame through the delay and then gets out of the
+   way entirely, leaving transform and opacity free for :hover. */
+.stagger:not(.revealed) > * {
+  opacity: 0;
+}
+
+.stagger.revealed > * {
+  animation: fade-up var(--dur-slow) var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * var(--stagger-step));
+}
+
+/* Opacity-only stagger, for rows where vertical movement would feel busy. */
+.stagger.stagger-fade.revealed > * {
+  animation-name: fade-in;
+}
+
+.stagger > *:nth-child(1)  { --i: 0; }
+.stagger > *:nth-child(2)  { --i: 1; }
+.stagger > *:nth-child(3)  { --i: 2; }
+.stagger > *:nth-child(4)  { --i: 3; }
+.stagger > *:nth-child(5)  { --i: 4; }
+.stagger > *:nth-child(6)  { --i: 5; }
+.stagger > *:nth-child(7)  { --i: 6; }
+.stagger > *:nth-child(8)  { --i: 7; }
+.stagger > *:nth-child(9)  { --i: 8; }
+.stagger > *:nth-child(10) { --i: 9; }
+.stagger > *:nth-child(11) { --i: 10; }
+.stagger > *:nth-child(12) { --i: 11; }
+
+/* The kicker's dash draws itself once its section reveals. */
+.reveal .section-kicker-dash {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-slow) var(--ease-out) 120ms;
+}
+
+.reveal.revealed .section-kicker-dash {
+  transform: scaleX(1);
+}
+
+/* ==========================================================================
+   Mount animations
+
+   For things that animate as soon as they render (hero copy, page wrappers),
+   no scroll trigger involved. Sequence them with style={{ '--delay': '120ms' }}.
+   ========================================================================== */
+
+.anim {
+  opacity: 0;
+  animation-duration: var(--dur-slow);
+  animation-timing-function: var(--ease-out);
+  animation-fill-mode: both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.anim-fade-in   { animation-name: fade-in; }
+.anim-fade-up   { animation-name: fade-up; }
+.anim-fade-down { animation-name: fade-down; }
+.anim-fade-left { animation-name: fade-left; }
+.anim-scale-in  { animation-name: scale-in; }
+.anim-pop-in    { animation-name: pop-in; animation-timing-function: var(--ease-back); }
+
+/* Route transition wrapper — remounted on navigation so this replays. */
+.page-transition {
+  animation: page-enter var(--dur-base) var(--ease-out) both;
+}
+
+/* ==========================================================================
+   Interaction: hover, press, focus
+   ========================================================================== */
+
+.hover-lift {
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out),
+    background-color var(--dur-base) var(--ease-out);
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px var(--divider-strong),
+    0 10px 28px rgba(0, 0, 0, 0.32);
+}
+
+.hover-lift:active {
+  transform: translateY(-1px);
+  transition-duration: var(--dur-instant);
+}
+
+/* Small tactile response for buttons and chips. */
+.press {
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.press:active {
+  transform: scale(0.96);
+}
+
+/* An arrow that slides on hover — used on "read more" style links. */
+.arrow-link .arrow {
+  display: inline-block;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.arrow-link:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* Underline that grows from the left. */
+.underline-grow {
+  position: relative;
+}
+
+.underline-grow::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1.5px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.underline-grow:hover::after,
+.underline-grow.active::after {
+  transform: scaleX(1);
+}
+
+/* Visible keyboard focus everywhere, without showing rings on mouse clicks. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* ==========================================================================
+   Reduced motion
+
+   Anyone who has asked their OS for less motion gets the final state
+   immediately: content still appears, it just does not move.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal,
+  .stagger > *,
+  .anim {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .hover-lift:hover,
+  .press:active {
+    transform: none !important;
+  }
+
+  .reveal .section-kicker-dash {
+    transform: scaleX(1) !important;
+  }
+}

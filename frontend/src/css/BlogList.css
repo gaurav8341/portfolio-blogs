@@ -8,7 +8,19 @@
   font-size: 36px;
   font-weight: 500;
   color: var(--text);
-  margin: 0 0 20px;
+  margin: 0 0 8px;
+}
+
+.blog-list-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 0 0 22px;
+}
+
+.blog-empty {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  margin: 4px 0 0;
 }
 
 .tag-filters {
@@ -54,11 +66,48 @@
 
 .blog-item-link {
   display: block;
+  position: relative;
   background: var(--surface);
   border-radius: var(--radius-md);
   padding: 20px;
   box-shadow: var(--card-shadow);
   text-decoration: none;
+  overflow: hidden;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+/* Accent rail that slides down the left edge on hover. */
+.blog-item-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent), var(--accent-hover));
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+
+.blog-item-link:hover,
+.blog-item-link:focus-visible {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px var(--divider-strong),
+    0 12px 30px rgba(0, 0, 0, 0.32);
+}
+
+.blog-item-link:hover::before,
+.blog-item-link:focus-visible::before {
+  transform: scaleY(1);
+}
+
+.blog-item-link:active {
+  transform: translateY(-1px);
+  transition-duration: var(--dur-instant);
 }
 
 .blog-item-title {
@@ -66,6 +115,11 @@
   font-weight: 500;
   color: var(--text);
   margin: 0 0 6px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.blog-item-link:hover .blog-item-title {
+  color: var(--accent);
 }
 
 .blog-item-preview {

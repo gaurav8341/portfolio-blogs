@@ -1,0 +1,23 @@
+/* Pinned to the very top of the viewport and stacked above the sticky header,
+   rather than offset to sit below it — the header's height depends on its font
+   metrics and button padding, so any hard-coded offset drifts. */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  z-index: 20;
+  background: transparent;
+  pointer-events: none;
+}
+
+.reading-progress-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+  transform: scaleX(0);
+  transform-origin: left center;
+  /* Short transition smooths per-frame jitter without feeling laggy. */
+  transition: transform 90ms linear;
+}

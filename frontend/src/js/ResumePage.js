@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import CommonLayout from './CommonLayout';
+import Reveal from './Reveal';
+import { staggerStyle } from './motion';
 import '../css/ResumePage.css';
 
 const RESUME_DATA = [
@@ -38,42 +39,67 @@ const ResumePage = () => {
   };
 
   return (
-    <CommonLayout>
       <div className="resume-page">
-        <h1 className="resume-heading">Résumé</h1>
-        <p className="resume-subtitle">Filter by type, filter by skill, click an entry for details.</p>
+        <h1 className="resume-heading anim anim-fade-up">Résumé</h1>
+        <p className="resume-subtitle anim anim-fade-up" style={{ '--delay': '100ms' }}>
+          Filter by type, filter by skill, click an entry for details.
+        </p>
 
-        <div className="resume-filters">
-          {FILTERS.map((f) => (
+        <Reveal className="resume-filters" variant="fade" stagger>
+          {FILTERS.map((f, index) => (
             <button
               key={f.key}
-              className={`resume-filter-btn${filter === f.key ? ' active' : ''}`}
+              className={`resume-filter-btn press${filter === f.key ? ' active' : ''}`}
+              style={staggerStyle(index)}
               onClick={() => setResumeFilter(f.key)}
+              aria-pressed={filter === f.key}
             >
               {f.label}
             </button>
           ))}
-        </div>
+        </Reveal>
 
-        <div className="resume-skill-filters">
-          {allSkills.map((skill) => (
+        <Reveal className="resume-skill-filters" variant="fade" stagger>
+          {allSkills.map((skill, index) => (
             <button
               key={skill}
-              className={`resume-skill-chip${skillFilter === skill ? ' active' : ''}`}
+              className={`resume-skill-chip press${skillFilter === skill ? ' active' : ''}`}
+              style={staggerStyle(index)}
               onClick={() => toggleSkillFilter(skill)}
+              aria-pressed={skillFilter === skill}
             >
               {skill}
             </button>
           ))}
-        </div>
+        </Reveal>
 
-        <div className="resume-timeline">
-          {entries.map((entry) => {
+        {/* Keyed on the active filters so changing them replays the timeline
+            stagger instead of swapping entries in place. */}
+        <Reveal
+          key={`${filter}-${skillFilter || 'any'}`}
+          className="resume-timeline"
+          variant="fade"
+          stagger
+        >
+          {entries.map((entry, index) => {
             const expanded = expandedId === entry.id;
             return (
-              <div key={entry.id} className="resume-entry">
+              <div key={entry.id} className="resume-entry" style={staggerStyle(index)}>
                 <div className="resume-entry-dot" />
-                <div className="resume-entry-header" onClick={() => toggleEntry(entry.id)}>
+                <div
+                  className="resume-entry-header"
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={expanded}
+                  aria-controls={`resume-details-${entry.id}`}
+                  onClick={() => toggleEntry(entry.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggleEntry(entry.id);
+                    }
+                  }}
+                >
                   <div className="resume-entry-top">
                     <span className="resume-entry-role">{entry.role}</span>
                     <span className="resume-entry-period">{entry.period}</span>
@@ -92,22 +118,38 @@ const ResumePage = () => {
                     </span>
                   ))}
                 </div>
-                {expanded && (
-                  <ul className="resume-entry-details">
-                    {entry.details.map((detail, index) => (
-                      <li key={index}>{detail}</li>
-                    ))}
-                  </ul>
-                )}
-                <button className="resume-toggle-link" onClick={() => toggleEntry(entry.id)}>
+                {/* Stays mounted and collapses to zero height so the open/close
+                    can actually animate. */}
+                <div
+                  id={`resume-details-${entry.id}`}
+                  className={`resume-details-wrap${expanded ? ' open' : ''}`}
+                >
+                  <div className="resume-details-inner">
+                    <ul className="resume-entry-details">
+                      {entry.details.map((detail, detailIndex) => (
+                        <li key={detailIndex} style={staggerStyle(detailIndex)}>{detail}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <button
+                  className="resume-toggle-link"
+                  onClick={() => toggleEntry(entry.id)}
+                  aria-hidden="true"
+                  tabIndex={-1}
+                >
+                  <span className="resume-toggle-caret">▸</span>
                   {expanded ? 'Show less' : 'Show more'}
                 </button>
               </div>
             );
           })}
-        </div>
+        </Reveal>
+
+        {entries.length === 0 && (
+          <p className="resume-empty anim anim-fade-in">Nothing matches that combination.</p>
+        )}
       </div>
-    </CommonLayout>
   );
 };
 

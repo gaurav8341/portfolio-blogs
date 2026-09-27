@@ -12,6 +12,19 @@
   margin-bottom: 20px;
 }
 
+.back-arrow {
+  display: inline-block;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.back-link:hover .back-arrow {
+  transform: translateX(-4px);
+}
+
+.blog-detail-loading {
+  padding-top: 4px;
+}
+
 .blog-detail-title {
   font-size: 34px;
   font-weight: 500;
@@ -50,10 +63,23 @@
 .blog-detail-body a {
   color: var(--accent);
   text-decoration: none;
+  background-image: linear-gradient(var(--accent-hover), var(--accent-hover));
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  background-position: left bottom 1px;
+  transition:
+    background-size var(--dur-base) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
 }
 
 .blog-detail-body a:hover {
   color: var(--accent-hover);
+  background-size: 100% 1px;
+}
+
+/* Diagrams settle in rather than appearing abruptly once mermaid renders. */
+.mermaid {
+  animation: fade-in var(--dur-slow) var(--ease-out) both;
 }
 
 .blog-detail-body code {

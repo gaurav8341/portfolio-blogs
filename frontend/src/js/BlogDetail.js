@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import CommonLayout from './CommonLayout';
 import axios from 'axios';
 import Mermaid from './Mermaid';
+import ReadingProgress from './ReadingProgress';
+import { SkeletonLine } from './Skeleton';
 import '../css/BlogDetail.css';
 import { readingTime } from './utils';
 
@@ -54,13 +55,16 @@ const BlogDetail = ({ blogPaths, blogs }) => {
     const body = content ? content.replace(/^#\s+.+\n+/, '') : content;
 
     return (
-        <CommonLayout>
+        <>
+            <ReadingProgress />
             <div className="blog-detail">
-                <Link to="/blogs" className="back-link">← Back to blog</Link>
+                <Link to="/blogs" className="back-link anim anim-fade-in">
+                    <span className="back-arrow">←</span> Back to blog
+                </Link>
                 {meta && (
                     <>
-                        <h1 className="blog-detail-title">{meta.title}</h1>
-                        <div className="blog-detail-meta">
+                        <h1 className="blog-detail-title anim anim-fade-up" style={{ '--delay': '60ms' }}>{meta.title}</h1>
+                        <div className="blog-detail-meta anim anim-fade-up" style={{ '--delay': '140ms' }}>
                             <span>{meta.date}</span>
                             {content && (
                                 <>
@@ -79,13 +83,24 @@ const BlogDetail = ({ blogPaths, blogs }) => {
                 )}
                 <div className="blog-detail-body">
                     {content ? (
-                        <ReactMarkdown components={components}>{body}</ReactMarkdown>
+                        <div className="anim anim-fade-up">
+                            <ReactMarkdown components={components}>{body}</ReactMarkdown>
+                        </div>
                     ) : (
-                        <p>Loading...</p>
+                        <div className="blog-detail-loading" role="status" aria-label="Loading article">
+                            {['96%', '100%', '88%', '92%', '64%', '100%', '78%'].map((width, index) => (
+                                <SkeletonLine
+                                    key={index}
+                                    width={width}
+                                    height={15}
+                                    style={{ marginBottom: index === 3 ? 28 : 14 }}
+                                />
+                            ))}
+                        </div>
                     )}
                 </div>
             </div>
-        </CommonLayout>
+        </>
     );
 };
 

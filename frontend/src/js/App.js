@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import CommonLayout from './CommonLayout';
 import Home from './Home';
 import Project from './Project';
 import BlogList from './BlogList';
@@ -42,11 +43,15 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/blogs" element={<BlogList />} />
-        <Route path="/blogs/:id" element={<BlogDetail blogPaths={blogPaths} blogs={blogs} />} />
-        <Route path="/projects" element={<Project />} />
-        <Route path="/resume" element={<ResumePage />} />
+        {/* Layout route: header, footer and command palette stay mounted across
+            navigation, so only the page content animates on a route change. */}
+        <Route element={<CommonLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/blogs" element={<BlogList />} />
+          <Route path="/blogs/:id" element={<BlogDetail blogPaths={blogPaths} blogs={blogs} />} />
+          <Route path="/projects" element={<Project />} />
+          <Route path="/resume" element={<ResumePage />} />
+        </Route>
       </Routes>
     </Router>
   );

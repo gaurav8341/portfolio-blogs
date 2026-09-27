@@ -32,6 +32,15 @@
   font-size: 18px;
   color: var(--text);
   text-decoration: none;
+  display: inline-block;
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.site-title:hover {
+  color: var(--accent);
+  transform: translateX(2px);
 }
 
 .site-nav {
@@ -97,6 +106,7 @@
   background-color: var(--text);
   display: block;
   position: relative;
+  transition: background-color var(--dur-fast) var(--ease-out);
 }
 
 .hamburger::before,
@@ -108,6 +118,9 @@
   display: block;
   position: absolute;
   left: 0;
+  transition:
+    top var(--dur-base) var(--ease-out),
+    transform var(--dur-base) var(--ease-out);
 }
 
 .hamburger::before {
@@ -118,10 +131,28 @@
   top: 7px;
 }
 
+/* Collapses the three bars into an X while the menu is open. */
+.hamburger.open {
+  background-color: transparent;
+}
+
+.hamburger.open::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.hamburger.open::after {
+  top: 0;
+  transform: rotate(-45deg);
+}
+
 /* Media Queries for Mobile Devices */
 @media (max-width: 768px) {
+  /* Toggled with visibility rather than display: a display change cancels the
+     transition outright, so the old fade never actually ran. visibility is
+     delayed on the way out so the fade is visible before it stops hit-testing. */
   .site-nav {
-    display: none;
+    display: flex;
     flex-direction: column;
     position: absolute;
     top: 60px;
@@ -131,14 +162,24 @@
     text-align: center;
     border-bottom: 1px solid var(--divider);
     opacity: 0;
-    transform: translateY(-20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-14px);
+    transition:
+      opacity var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out),
+      visibility 0s linear var(--dur-base);
   }
 
   .site-nav.open {
-    display: flex;
     opacity: 1;
-    transform: translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+    transition:
+      opacity var(--dur-base) var(--ease-out),
+      transform var(--dur-base) var(--ease-out),
+      visibility 0s;
   }
 
   .navbar-menu {
@@ -148,6 +189,21 @@
 
   .navbar-item {
     margin: 0.75rem 0;
+  }
+
+  /* Links drop in one after another once the panel opens. */
+  .site-nav.open .navbar-item {
+    animation: fade-down var(--dur-base) var(--ease-out) backwards;
+  }
+
+  .site-nav.open .navbar-item:nth-child(1) { animation-delay: 60ms; }
+  .site-nav.open .navbar-item:nth-child(2) { animation-delay: 110ms; }
+  .site-nav.open .navbar-item:nth-child(3) { animation-delay: 160ms; }
+  .site-nav.open .navbar-item:nth-child(4) { animation-delay: 210ms; }
+
+  /* The underline animation reads as clutter in the stacked mobile menu. */
+  .page-link.underline-grow::after {
+    display: none;
   }
 
   .menu-toggle {

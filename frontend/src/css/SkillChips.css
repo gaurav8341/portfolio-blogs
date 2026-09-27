@@ -10,6 +10,25 @@
   box-shadow: var(--card-shadow);
   padding: 10px 14px;
   min-width: 150px;
+  cursor: default;
+  transition:
+    transform var(--dur-base) var(--ease-out),
+    box-shadow var(--dur-base) var(--ease-out);
+}
+
+.skill-chip:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 0 1px var(--divider-strong),
+    0 8px 22px rgba(0, 0, 0, 0.3);
+}
+
+.skill-chip:hover .skill-chip-name {
+  color: var(--accent);
+}
+
+.skill-chip:hover .skill-chip-stars {
+  color: var(--accent-hover);
 }
 
 .skill-chip-row {
@@ -24,6 +43,7 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--text);
+  transition: color var(--dur-fast) var(--ease-out);
 }
 
 .skill-chip-type {
@@ -39,4 +59,5 @@
   color: var(--accent);
   font-size: 12px;
   letter-spacing: 2px;
+  transition: color var(--dur-fast) var(--ease-out);
 }

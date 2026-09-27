@@ -76,10 +76,29 @@
 }
 
 .resume-timeline {
+  position: relative;
   display: flex;
   flex-direction: column;
-  border-left: 2px solid rgba(226, 163, 85, 0.3);
   padding-left: 24px;
+}
+
+/* The spine is a pseudo-element rather than a border so it can draw itself
+   downward when the timeline scrolls into view. */
+.resume-timeline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: rgba(226, 163, 85, 0.3);
+  transform: scaleY(0);
+  transform-origin: top center;
+  transition: transform 900ms var(--ease-out);
+}
+
+.resume-timeline.revealed::before {
+  transform: scaleY(1);
 }
 
 .resume-entry {
@@ -89,16 +108,38 @@
 
 .resume-entry-dot {
   position: absolute;
-  left: -30px;
+  left: -28px;
   top: 4px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
   background: var(--accent);
+  transition: transform var(--dur-base) var(--ease-back);
+}
+
+/* Each dot pops in behind its entry, then rings once. --i is inherited from
+   the parent .resume-entry, so the dots follow the same stagger as the cards. */
+.resume-timeline.revealed .resume-entry-dot {
+  animation:
+    pop-in var(--dur-base) var(--ease-back) backwards,
+    pulse-ring 1.8s var(--ease-out) 1;
+  animation-delay: calc(var(--i, 0) * var(--stagger-step) + 160ms);
+}
+
+.resume-entry:hover .resume-entry-dot {
+  transform: scale(1.35);
 }
 
 .resume-entry-header {
   cursor: pointer;
+}
+
+.resume-entry-role {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.resume-entry-header:hover .resume-entry-role {
+  color: var(--accent);
 }
 
 .resume-entry-top {
@@ -140,9 +181,30 @@
   margin-bottom: 10px;
 }
 
+/* Collapsible wrapper. grid-template-rows animates between 0fr and 1fr, which
+   gives a real height transition without hard-coding a max-height. */
+.resume-details-wrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows var(--dur-base) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
+}
+
+.resume-details-wrap.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.resume-details-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
 .resume-entry-details {
   margin: 0;
-  padding-left: 18px;
+  padding: 4px 0 0 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -154,8 +216,16 @@
   line-height: 1.55;
 }
 
+/* Bullets slide in one after another once the panel is open. */
+.resume-details-wrap.open .resume-entry-details li {
+  animation: fade-left var(--dur-base) var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms + 100ms);
+}
+
 .resume-toggle-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   margin-top: 8px;
   font-size: 12px;
   color: var(--accent);
@@ -164,6 +234,33 @@
   border: none;
   padding: 0;
   font-family: var(--font-body);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.resume-toggle-link:hover {
+  color: var(--accent-hover);
+}
+
+.resume-toggle-caret {
+  display: inline-block;
+  font-size: 9px;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.resume-details-wrap.open ~ .resume-toggle-link .resume-toggle-caret {
+  transform: rotate(90deg);
+}
+
+.resume-empty {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  margin: 16px 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-timeline::before {
+    transform: scaleY(1) !important;
+  }
 }
 
 @media (max-width: 768px) {

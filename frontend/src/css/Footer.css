@@ -29,12 +29,23 @@
 .social-link {
   color: var(--text);
   text-decoration: none;
+  display: inline-flex;
+  transition: transform var(--dur-base) var(--ease-back);
 }
 
 .social-link svg {
   fill: var(--text);
   width: 18px;
   height: 18px;
+  transition: fill var(--dur-fast) var(--ease-out);
+}
+
+.social-link:hover {
+  transform: translateY(-3px) scale(1.12);
+}
+
+.social-link:active {
+  transform: translateY(-1px) scale(1.02);
 }
 
 .social-link:hover svg {
